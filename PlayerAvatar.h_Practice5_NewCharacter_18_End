@@ -1,0 +1,82 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "Camera/CameraComponent.h"
+#include "PlayerAvatar.generated.h"
+class USpringArmComponent;
+class UCameraComponent;
+class UInputAction;
+struct FInputActionValue;
+
+UCLASS()
+class SAMINCHING_API APlayerAvatar : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	APlayerAvatar();
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { 
+		return CameraBoom; 
+	}
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { 
+		return FollowCamera; 
+	}
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera,
+		meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera,
+		meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	int __HealthPoints;
+	float __AttackCountingDown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* AttackAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveAction;
+	void Attack(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, Category = "PlayerAvatar Params")
+	int HealthPoints = 500;
+	UPROPERTY(EditAnywhere, Category = "PlayerAvatar Params")
+	float Strength = 10;
+	UPROPERTY(EditAnywhere, Category = "PlayerAvatar Params")
+	float Armer = 3;
+	UPROPERTY(EditAnywhere, Category = "PlayerAvatar Params")
+	float AttackRange = 6.0f;
+	UPROPERTY(EditAnywhere, Category = "PlayerAvatar Params")
+	float AttackInterval = 1.2f;
+	UFUNCTION(BlueprintCallable, Category = "Plater Avatar", Meta = (DisplayName = "Get HP"))
+	int GetHealthPoints();
+	bool IsKilled();
+	bool CanAttack();
+};
+
+template<typename T>
+struct TRotator {
+public:
+	using FReal = T;
+	T pitch;
+	T Yaw;
+	T Roll;
+};
